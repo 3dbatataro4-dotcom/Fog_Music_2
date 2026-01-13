@@ -246,6 +246,12 @@
                     <button class="btn-offset" onclick="adjustOffset(5)">+</button>
                 </div>
                 <div class="setting-row">
+                    <span style="width: 15vh; text-align: right;">JUDGE</span>
+                    <button class="btn-offset" onclick="adjustJudgeHeight(-0.05)">-</button>
+                    <span id="judge-display" style="width: 10vh; text-align: center;">65%</span>
+                    <button class="btn-offset" onclick="adjustJudgeHeight(0.05)">+</button>
+                </div>
+                <div class="setting-row">
                     <span style="width: 15vh; text-align: right;">SFX</span>
                     <button class="btn-offset" onclick="changeSFX(-1)">&lt;</button>
                     <span id="sfx-display" style="width: 15vh; text-align: center; font-size: 2.5vh;">DEFAULT</span>
@@ -320,22 +326,22 @@ let currentSFXIndex = 0;
 let SFX = SFX_SETS[0];
 
 const SONGS = [
-    { id: 0, title: "01.泥土裡的壞脾氣", color: "#66ff66", cover: "https://i.meee.com.tw/YCIig0r.jpg", src: "https://files.catbox.moe/n0otl1.mp3", preview: 10.4 },
-    { id: 1, title: "02.無頭騎士序曲", color: "#ff4500", cover: "https://meee.com.tw/VJB7LBg.jpg", src: "https://files.catbox.moe/9aqtcj.mp3", preview: 14.4 },
-    { id: 2, title: "03.鏽蝕的脈搏", color: "#8b4513", cover: "https://files.catbox.moe/xivzat.jpg", src: "https://files.catbox.moe/rqwk8s.mp3", preview: 10 },
-    { id: 3, title: "04.霧都點名簿", color: "#232896", cover: "https://files.catbox.moe/axic1b.jpg", src: "https://files.catbox.moe/9mz87d.mp3", preview: 10 },
-    { id: 4, title: "05.星盤下的謊言", color: "#ff0000", cover: "https://files.catbox.moe/4pis1o.jpg", src: "https://files.catbox.moe/tkok9u.mp3", preview: 10 },
-    { id: 5, title: "06.泛黃的處方籤", color: "#eee8aa", cover: "https://files.catbox.moe/5wamgm.jpg", src: "https://files.catbox.moe/fyxcfi.mp3", preview: 10 },
-    { id: 6, title: "07.這麻煩有點大", color: "#9394E6", cover: "https://files.catbox.moe/oi2lh5.jpg", src: "https://files.catbox.moe/g8dbzw.mp3", preview: 10 },
-    { id: 7, title: "08.絕對無菌的處刑曲", color: "#85846A", cover: "https://files.catbox.moe/ishaxg.jpg", src: "https://files.catbox.moe/ffb3gz.mp3", preview: 10 },
-    { id: 8, title: "09.真理跪拜於我", color: "#00008b", cover: "https://files.catbox.moe/q06wsw.jpg", src: "https://files.catbox.moe/8mo7mf.mp3", preview: 10 },
-    { id: 9, title: "10.玻璃的恩典", color: "#87ceeb", cover: "https://files.catbox.moe/unqwk1.jpg", src: "https://files.catbox.moe/9lxu2s.mp3", preview: 10 },
-    { id: 10, title: "11.易碎的明天", color: "#ffd700", cover: "https://files.catbox.moe/5mfu5q.jpg", src: "https://files.catbox.moe/4j2pty.mp3", preview: 10 },
-    { id: 11, title: "12.越界的代價", color: "#4C3E80", cover: "https://files.catbox.moe/zmpmwk.jpg", src: "https://files.catbox.moe/kg60ar.mp3", preview: 10 },
-    { id: 12, title: "13.融入的藝術", color: "#ff69b4", cover: "https://files.catbox.moe/usm7nv.jpg", src: "https://files.catbox.moe/v2dt14.mp3", preview: 10 },
-    { id: 13, title: "14.名為永恆的毒蘋果", color: "#800080", cover: "https://files.catbox.moe/2xbvom.jpg", src: "https://files.catbox.moe/5wtu1z.mp3", preview: 10 },
-    { id: 14, title: "15.零層會議", color: "#333333", cover: "https://files.catbox.moe/bgpkld.jpg", src: "https://files.catbox.moe/mklbah.mp3", preview: 10 },
-    { id: 15, title: "16.最初的清晨", color: "#F5CC5B", cover: "https://files.catbox.moe/y6efl4.jpg", src: "https://files.catbox.moe/xcbk67.mp3", preview: 10 }
+    { id: 0, title: "泥土裡的壞脾氣", color: "#66ff66", cover: "https://i.meee.com.tw/YCIig0r.jpg", src: "https://files.catbox.moe/n0otl1.mp3", preview: 10.4 },
+    { id: 1, title: "無頭騎士序曲", color: "#ff4500", cover: "https://meee.com.tw/VJB7LBg.jpg", src: "https://files.catbox.moe/9aqtcj.mp3", preview: 14.4 },
+    { id: 2, title: "鏽蝕的脈搏", color: "#8b4513", cover: "https://files.catbox.moe/xivzat.jpg", src: "https://files.catbox.moe/rqwk8s.mp3", preview: 10 },
+    { id: 3, title: "霧都點名簿", color: "#232896", cover: "https://files.catbox.moe/axic1b.jpg", src: "https://files.catbox.moe/9mz87d.mp3", preview: 10 },
+    { id: 4, title: "星盤下的謊言", color: "#ff0000", cover: "https://files.catbox.moe/4pis1o.jpg", src: "https://files.catbox.moe/tkok9u.mp3", preview: 10 },
+    { id: 5, title: "泛黃的處方籤", color: "#eee8aa", cover: "https://files.catbox.moe/5wamgm.jpg", src: "https://files.catbox.moe/fyxcfi.mp3", preview: 10 },
+    { id: 6, title: "這麻煩有點大", color: "#9394E6", cover: "https://files.catbox.moe/oi2lh5.jpg", src: "https://files.catbox.moe/g8dbzw.mp3", preview: 10 },
+    { id: 7, title: "絕對無菌的處刑曲", color: "#85846A", cover: "https://files.catbox.moe/ishaxg.jpg", src: "https://files.catbox.moe/ffb3gz.mp3", preview: 10 },
+    { id: 8, title: "真理跪拜於我", color: "#00008b", cover: "https://files.catbox.moe/q06wsw.jpg", src: "https://files.catbox.moe/8mo7mf.mp3", preview: 10 },
+    { id: 9, title: "玻璃的恩典", color: "#87ceeb", cover: "https://files.catbox.moe/unqwk1.jpg", src: "https://files.catbox.moe/9lxu2s.mp3", preview: 10 },
+    { id: 10, title: "易碎的明天", color: "#ffd700", cover: "https://files.catbox.moe/5mfu5q.jpg", src: "https://files.catbox.moe/4j2pty.mp3", preview: 10 },
+    { id: 11, title: "越界的代價", color: "#4C3E80", cover: "https://files.catbox.moe/zmpmwk.jpg", src: "https://files.catbox.moe/kg60ar.mp3", preview: 10 },
+    { id: 12, title: "融入的藝術", color: "#ff69b4", cover: "https://files.catbox.moe/usm7nv.jpg", src: "https://files.catbox.moe/v2dt14.mp3", preview: 10 },
+    { id: 13, title: "名為永恆的毒蘋果", color: "#800080", cover: "https://files.catbox.moe/2xbvom.jpg", src: "https://files.catbox.moe/5wtu1z.mp3", preview: 10 },
+    { id: 14, title: "零層會議", color: "#333333", cover: "https://files.catbox.moe/bgpkld.jpg", src: "https://files.catbox.moe/mklbah.mp3", preview: 10 },
+    { id: 15, title: "最初的清晨", color: "#F5CC5B", cover: "https://files.catbox.moe/y6efl4.jpg", src: "https://files.catbox.moe/xcbk67.mp3", preview: 10 }
 ,{ id: 16, title: "Coming soon", color: "#ffffff", cover: "https://files.catbox.moe/ypzq8c.jpg", src: "", preview: 10 }
 ];
 const JSON_DB = {
@@ -119728,9 +119734,10 @@ function generateChart(jsonData, diff) {
 }
 
 const PERSPECTIVE_TOP_SCALE = 0.5; // Top is 50% of bottom width
+const PLAY_WIDTH_PCT = 0.8; // Play area is 80% of screen width
 
 let currentFallTime = 2.0; 
-const JUDGE_LINE_PCT = 0.65; 
+let userJudgeHeight = parseFloat(localStorage.getItem('nocturne_judge') || 0.65);
 const AUDIO_DELAY = 3.0; 
 const P_WIN = 0.08; const GR_WIN = 0.15; const GD_WIN = 0.25; 
 
@@ -119769,6 +119776,7 @@ window.onload = () => {
     document.getElementById('speed-display').innerText = userSpeed.toFixed(1);
     document.getElementById('vol-music').value = musicVol;
     document.getElementById('vol-sfx').value = sfxVol;
+    updateJudgeUI();
     loop();
     const bind = (evt) => inputZone.addEventListener(evt, handleInput, {passive:false});
     bind('mousedown'); bind('touchstart'); bind('touchmove'); bind('touchend'); bind('mouseup');
@@ -119779,6 +119787,22 @@ function handleResize() {
     const rect = container.getBoundingClientRect();
     width = rect.width; height = rect.height;
     canvas.width = width; canvas.height = height;
+}
+
+function adjustJudgeHeight(delta) {
+    userJudgeHeight += delta;
+    if(userJudgeHeight < 0.2) userJudgeHeight = 0.2;
+    if(userJudgeHeight > 0.9) userJudgeHeight = 0.9;
+    userJudgeHeight = Math.round(userJudgeHeight*100)/100;
+    localStorage.setItem('nocturne_judge', userJudgeHeight);
+    updateJudgeUI();
+}
+
+function updateJudgeUI() {
+    const disp = document.getElementById('judge-display');
+    if(disp) disp.innerText = Math.round(userJudgeHeight*100) + "%";
+    const jc = document.getElementById('judge-container');
+    if(jc) jc.style.top = (userJudgeHeight * 100 - 5) + "%";
 }
 
 async function loadSFX(url, key) {
@@ -119942,7 +119966,9 @@ async function changeSFX(dir) {
 }
 
 function getPerspective(pct) {
-    const s = PERSPECTIVE_TOP_SCALE + (1 - PERSPECTIVE_TOP_SCALE) * pct;
+    const bottomS = PLAY_WIDTH_PCT;
+    const topS = bottomS * PERSPECTIVE_TOP_SCALE;
+    const s = topS + (bottomS - topS) * pct;
     const lw = width * s;
     const xo = (width - lw) / 2;
     return { s, lw, xo };
@@ -119964,7 +119990,7 @@ function loop() {
         } else { touchFeedback.splice(i,1); }
     });
 
-    const JUDGE_Y = height * JUDGE_LINE_PCT;
+    const JUDGE_Y = height * userJudgeHeight;
     const songColor = SONGS[currentSongIdx].color;
 
     const topWidth = width * PERSPECTIVE_TOP_SCALE;
@@ -120277,7 +120303,7 @@ function handleInput(e) {
     
     const rect = inputZone.getBoundingClientRect();
     const NORMAL_X_WIN = width * 0.25; 
-    const NORMAL_Y_WIN = width * 0.15; 
+    const NORMAL_Y_WIN = height * 0.3; 
     const SLIDE_X_WIN = width * 0.05; 
 
     touches.forEach(t => {
@@ -120334,7 +120360,7 @@ function handleInput(e) {
 
                     if(isStartHit && !n.holding) {
                         playSFX('HOLD'); n.holding = true;
-                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
+                        hitEffects.push({x: targetX, y: height*userJudgeHeight, life: 1, color: n.songColor});
                         n.holdingTouchId = id;
                         break; 
                     }
@@ -120348,8 +120374,8 @@ function handleInput(e) {
                     if (type === 'touchstart' || type === 'mousedown' || type === 'touchmove') {
                         playSFX('SLIDE'); n.hit=true; 
                         addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)");
-                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
-                        combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 8); updateHUD();
+                        hitEffects.push({x: targetX, y: height*userJudgeHeight, life: 1, color: n.songColor});
+                        combo++; spawnParticles(targetX, height*userJudgeHeight, n.songColor, 8); updateHUD();
                     }
                 }
             } 
@@ -120368,8 +120394,8 @@ function handleInput(e) {
                      if (triggered) {
                         playSFX('FLICK'); n.hit=true; 
                         addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)");
-                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
-                        combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 20); updateHUD();
+                        hitEffects.push({x: targetX, y: height*userJudgeHeight, life: 1, color: n.songColor});
+                        combo++; spawnParticles(targetX, height*userJudgeHeight, n.songColor, 20); updateHUD();
                         break; 
                      }
                  }
@@ -120382,8 +120408,8 @@ function handleInput(e) {
                          if (dt < P_WIN) { addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)"); }
                          else if (dt < GR_WIN) { addScore(0.8); stats.gr++; triggerJudge("GREAT", "var(--c-great)"); }
                          else { addScore(0.5); stats.gd++; triggerJudge("GOOD", "var(--c-good)"); }
-                         hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
-                         combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 15); updateHUD();
+                         hitEffects.push({x: targetX, y: height*userJudgeHeight, life: 1, color: n.songColor});
+                         combo++; spawnParticles(targetX, height*userJudgeHeight, n.songColor, 15); updateHUD();
                          break;
                     }
                 }
@@ -120439,6 +120465,7 @@ function pauseGame() {
         pausedTime = document.getElementById('bgm').currentTime;
         gameState="PAUSE"; 
         document.getElementById('bgm').pause(); 
+        isAudioPlaying = false;
         document.getElementById('screen-pause').classList.remove('hidden');
     }
 }
