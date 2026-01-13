@@ -119731,7 +119731,7 @@ function generateChart(jsonData, diff) {
 const PERSPECTIVE_TOP_SCALE = 0.5; // Top is 50% of bottom width
 
 let currentFallTime = 2.0; 
-const JUDGE_LINE_PCT = 0.70; 
+const JUDGE_LINE_PCT = 0.65; 
 const AUDIO_DELAY = 3.0; 
 const P_WIN = 0.08; const GR_WIN = 0.15; const GD_WIN = 0.25; 
 
@@ -119961,7 +119961,7 @@ function loop() {
         tf.life -= 0.08;
         if(tf.life > 0) {
             ctx.beginPath(); ctx.arc(tf.x, tf.y, 60 * (1-tf.life), 0, Math.PI*2);
-            ctx.strokeStyle = `rgba(255,255,255,${tf.life*0.5})`; ctx.stroke();
+            ctx.strokeStyle = `rgba(255,255,255,${tf.life})`; ctx.stroke();
         } else { touchFeedback.splice(i,1); }
     });
 
@@ -120267,6 +120267,7 @@ function addScore(multiplier) {
 }
 
 function handleInput(e) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
     if(gameState !== "PLAY") return;
     if(e.cancelable) e.preventDefault();
     const touches = e.changedTouches ? Array.from(e.changedTouches) : [e];
@@ -120276,8 +120277,9 @@ function handleInput(e) {
     const time = rawTime - (userOffset / 1000); 
     
     const rect = inputZone.getBoundingClientRect();
-    const NORMAL_X_WIN = width * 0.18; 
-    const SLIDE_X_WIN = width * 0.15; 
+    const NORMAL_X_WIN = width * 0.25; 
+    const NORMAL_Y_WIN = width * 0.15; 
+    const SLIDE_X_WIN = width * 0.20; 
 
     touches.forEach(t => {
         const tx = t.clientX - rect.left;
