@@ -119513,7 +119513,6 @@ const JSON_DB = {
   ]
 }  // 16.最初的清晨
 };
-
 const STORAGE_KEY = 'nocturne_save_v6'; 
 let userOffset = parseInt(localStorage.getItem('nocturne_offset') || 0);
 let userSpeed = parseFloat(localStorage.getItem('nocturne_speed') || 1.0);
@@ -120042,7 +120041,7 @@ function loop() {
         const { s: scale, lw: currentLaneWidth, xo: xOffset } = getPerspective(fallPct);
         const ny = fallPct * JUDGE_Y;
         const nx = xOffset + n.xPct * currentLaneWidth;
-        const nw = (width * 0.12) * scale;
+        const nw = (width * 0.155) * scale;
         const nh = (height * 0.035) * scale;
 
         if(dt < -GD_WIN && !n.hit && !n.holding) {
@@ -120067,11 +120066,11 @@ function loop() {
                     
                     const bx = bottom.xo + n.xPct * bottom.lw;
                     const by = visibleStartPct * JUDGE_Y;
-                    const bw = (width * 0.12) * bottom.s;
+                    const bw = (width * 0.155) * bottom.s;
                     
                     const tx = top.xo + n.xPct * top.lw;
                     const ty = visibleEndPct * JUDGE_Y;
-                    const tw = (width * 0.12) * top.s;
+                    const tw = (width * 0.155) * top.s;
                     
                     ctx.fillStyle = "rgba(255,255,255,0.3)";
                     ctx.beginPath(); ctx.moveTo(bx - bw/2, by); ctx.lineTo(bx + bw/2, by);
@@ -120097,10 +120096,10 @@ function loop() {
                         let persp1 = getPerspective(p1);
                         let persp2 = getPerspective(p2);
                         let x1 = persp1.xo + (n.xPct + off1) * persp1.lw;
-                        let w1 = (width * 0.12) * persp1.s;
+                        let w1 = (width * 0.155) * persp1.s;
                         let y1 = p1 * JUDGE_Y;
                         let x2 = persp2.xo + (n.xPct + off2) * persp2.lw;
-                        let w2 = (width * 0.12) * persp2.s;
+                        let w2 = (width * 0.155) * persp2.s;
                         let y2 = p2 * JUDGE_Y;
                         
                         ctx.beginPath(); ctx.moveTo(x1 - w1/2, y1); ctx.lineTo(x1 + w1/2, y1);
@@ -120154,8 +120153,8 @@ function loop() {
                     const pTop = getPerspective(yTop / JUDGE_Y);
                     const pBot = getPerspective(yBot / JUDGE_Y);
                     
-                    const wTop = (width * 0.12) * pTop.s * 0.9; 
-                    const wBot = (width * 0.12) * pBot.s * 0.9;
+                    const wTop = (width * 0.155) * pTop.s * 0.9; 
+                    const wBot = (width * 0.155) * pBot.s * 0.9;
                     
                     const xTop = pTop.xo + n.xPct * pTop.lw;
                     const xBot = pBot.xo + n.xPct * pBot.lw;
@@ -120181,20 +120180,23 @@ function loop() {
                         ctx.closePath();
                     };
 
-                    // 2. 上/下/左/右滑鍵 (Flick) - 白色內圈，歌曲色外發光
-                    drawArrow(1.0);
+                    // 2. 上/下/左/右滑鍵 (Flick) - 歌曲色填充，加粗白框，歌曲色光暈
+                    drawArrow(1.1);
                     ctx.shadowBlur = 20 * scale; 
-                    ctx.shadowColor = songColor; // Song Color Halo
-                    ctx.fillStyle = "#ffffff"; // White Inner
+                    ctx.shadowColor = "#ffffff"; // Song Color Halo
+                    ctx.fillStyle = songColor; // Song Color Fill
                     ctx.fill();
+                    ctx.lineWidth = 8 * scale; 
+                    ctx.strokeStyle = "#ffffff"; // White Border
+                    ctx.stroke();
                 } else {
                     // Tap / Hold Head / Big Tap - Perspective Trapezoid (Bar)
                     const yTop = ny - nh/2;
                     const yBot = ny + nh/2;
                     const pTop = getPerspective(yTop / JUDGE_Y);
                     const pBot = getPerspective(yBot / JUDGE_Y);
-                    const wTop = (width * 0.12) * pTop.s;
-                    const wBot = (width * 0.12) * pBot.s;
+                    const wTop = (width * 0.155) * pTop.s;
+                    const wBot = (width * 0.155) * pBot.s;
                     const xTop = pTop.xo + n.xPct * pTop.lw;
                     const xBot = pBot.xo + n.xPct * pBot.lw;
 
@@ -120274,8 +120276,8 @@ function handleInput(e) {
     const time = rawTime - (userOffset / 1000); 
     
     const rect = inputZone.getBoundingClientRect();
-    const NORMAL_X_WIN = width * 0.08; 
-    const SLIDE_X_WIN = width * 0.05; 
+    const NORMAL_X_WIN = width * 0.18; 
+    const SLIDE_X_WIN = width * 0.15; 
 
     touches.forEach(t => {
         const tx = t.clientX - rect.left;
