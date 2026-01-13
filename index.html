@@ -10,10 +10,11 @@
         :root {
             --bg-color: #050505;
             --c-perfect: #e6c288;
-            --c-great: #a8d8ea;
-            --c-good: #a3d9a5;
-            --c-miss: #e07a7a;
+            --c-great: #D6A7C2;
+            --c-good: #96B5D9;
+            --c-miss: #757575;
             --c-ss: #bde0fe;
+            --master-color: rgba(0,0,0,0);
         }
 
         body {
@@ -30,6 +31,7 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
             touch-action: none;
+            overscroll-behavior: none;
         }
 
         #bg-layer { 
@@ -39,13 +41,23 @@
             transition: background-image 0.8s ease-in-out;
             z-index: 0;
         }
+        
+        #vignette {
+            position: fixed; inset: 0; pointer-events: none; z-index: 900;
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+        }
+
+        #master-layer {
+            position: fixed; inset: 0; pointer-events: none; z-index: 800;
+            background: radial-gradient(circle, transparent 30%, var(--master-color) 90%);
+            opacity: 0; transition: opacity 0.5s;
+            mix-blend-mode: screen;
+        }
 
         #play-container {
             position: relative;
             width: 100%;
             height: 100%;
-            max-width: 177.78vh; 
-            aspect-ratio: 16/9;
             background: rgba(0, 0, 0, 0.2); 
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
             z-index: 1;
@@ -135,13 +147,10 @@
         .btn-master { color: #d7ccc8; }
         .btn-master:hover { color: #ff8a80; text-shadow: 0 0 20px #ff5252; }
 
-        .offset-ctrl {
-            position: absolute; bottom: 3vh; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 2vh; align-items: center; color: #888; font-size: 2vh;
-            background: rgba(0,0,0,0.5); padding: 1vh 2vh; border-radius: 20px; border: 1px solid #333;
-        }
-        .btn-offset { background: #333; color: #fff; border: none; width: 3vh; height: 3vh; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-offset:hover { background: var(--c-perfect); color: #000; }
+        .settings-group { margin: 2vh 0; display: flex; flex-direction: column; gap: 2.5vh; align-items: center; width: 100%; }
+        .setting-row { display: flex; gap: 2vh; align-items: center; color: #ccc; font-size: 3vh; font-family: 'Cinzel'; justify-content: center; width: 100%; }
+        .btn-offset { background: rgba(255,255,255,0.1); border: 2px solid #666; color: #fff; width: 7vh; height: 7vh; border-radius: 50%; cursor: pointer; font-size: 3.5vh; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-offset:hover { background: var(--c-perfect); color: #000; border-color: var(--c-perfect); }
 
         /* HUD */
         .hud-element { position: absolute; pointer-events: none; }
@@ -163,7 +172,7 @@
         }
         .pause-icon:hover { color: #fff; border-color: var(--c-perfect); background: rgba(255,255,255,0.2); }
 
-        .modal { background: rgba(10,12,15,0.95); border: 2px solid var(--c-perfect); padding: 5vh 5vw; text-align: center; box-shadow: 0 0 60px rgba(0,0,0,0.9); backdrop-filter: blur(15px); min-width: 50%; }
+        .modal { background: rgba(10,12,15,0.95); border: 2px solid var(--c-perfect); padding: 5vh 5vw; text-align: center; box-shadow: 0 0 60px rgba(0,0,0,0.9); backdrop-filter: blur(15px); min-width: 70%; }
         .btn-modal { display: block; width: 100%; margin: 2.5vh 0; padding: 2vh; background: transparent; border: 1px solid #666; color: #ccc; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; font-size: 3vh; font-weight: bold; }
         .btn-modal:hover { border-color: var(--c-perfect); color: var(--c-perfect); background: rgba(230, 194, 136, 0.1); }
 
@@ -173,6 +182,14 @@
         #orientation-lock .icon { font-size: 4rem; animation: rotate-phone 2s infinite ease-in-out; }
         @keyframes rotate-phone { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } }
         @media screen and (orientation: portrait) { #orientation-lock { display: flex; } #app { opacity: 0; pointer-events: none; } }
+
+        /* Custom Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 0.5vh; cursor: pointer; background: rgba(255,255,255,0.3); border-radius: 1vh; }
+        input[type=range]::-webkit-slider-thumb { height: 4vh; width: 4vh; border-radius: 50%; background: var(--c-perfect); cursor: pointer; -webkit-appearance: none; margin-top: -1.75vh; box-shadow: 0 0 10px var(--c-perfect); }
+        input[type=range]::-moz-range-track { width: 100%; height: 0.5vh; cursor: pointer; background: rgba(255,255,255,0.3); border-radius: 1vh; }
+        input[type=range]::-moz-range-thumb { height: 4vh; width: 4vh; border: none; border-radius: 50%; background: var(--c-perfect); cursor: pointer; box-shadow: 0 0 10px var(--c-perfect); }
     </style>
 </head>
 <body>
@@ -184,6 +201,8 @@
 </div>
 
 <div id="bg-layer"></div>
+<div id="vignette"></div>
+<div id="master-layer"></div>
 
 <div id="play-container">
     <canvas id="game"></canvas>
@@ -208,16 +227,41 @@
             <button class="btn-diff" onclick="startGame('HARD')">HARD</button>
             <button class="btn-diff btn-master" onclick="startGame('MASTER')">MASTER</button>
         </div>
-        <div class="offset-ctrl">
-            <button class="btn-offset" onclick="adjustOffset(-5)">-</button>
-            <span id="offset-display">0 ms</span>
-            <button class="btn-offset" onclick="adjustOffset(5)">+</button>
-        </div>
     </div>
 
     <div id="screen-pause" class="screen hidden active-ui">
         <div class="modal">
             <h2 style="color:var(--c-perfect); font-weight:400; letter-spacing:0.2em; margin-bottom:3vh; font-size: 5vh;">PAUSED</h2>
+            <div class="settings-group">
+                <div class="setting-row">
+                    <span style="width: 15vh; text-align: right;">SPEED</span>
+                    <button class="btn-offset" onclick="adjustSpeed(-0.1)">-</button>
+                    <span id="speed-display" style="width: 10vh; text-align: center;">1.0</span>
+                    <button class="btn-offset" onclick="adjustSpeed(0.1)">+</button>
+                </div>
+                <div class="setting-row">
+                    <span style="width: 15vh; text-align: right;">OFFSET</span>
+                    <button class="btn-offset" onclick="adjustOffset(-5)">-</button>
+                    <span id="pause-offset-display" style="width: 10vh; text-align: center;">0 ms</span>
+                    <button class="btn-offset" onclick="adjustOffset(5)">+</button>
+                </div>
+                <div class="setting-row">
+                    <span style="width: 15vh; text-align: right;">SFX</span>
+                    <button class="btn-offset" onclick="changeSFX(-1)">&lt;</button>
+                    <span id="sfx-display" style="width: 15vh; text-align: center; font-size: 2.5vh;">DEFAULT</span>
+                    <button class="btn-offset" onclick="changeSFX(1)">&gt;</button>
+                </div>
+                <div class="setting-row">
+                    <span style="width: 15vh; text-align: right;">MUSIC</span>
+                    <input type="range" id="vol-music" min="0" max="1" step="0.1" value="1" onchange="updateVolume()" style="width: 35vh;">
+                    <span style="width: 4vh"></span>
+                </div>
+                <div class="setting-row">
+                    <span style="width: 15vh; text-align: right;">SFX</span>
+                    <input type="range" id="vol-sfx" min="0" max="1" step="0.1" value="1" onchange="updateVolume()" style="width: 35vh;">
+                    <span style="width: 4vh"></span>
+                </div>
+            </div>
             <button class="btn-modal" onclick="resumeGame()">RESUME</button>
             <button class="btn-modal" onclick="quitGame()">EXIT</button>
         </div>
@@ -246,34 +290,54 @@
 <audio id="preview"></audio>
 
 <script>
-const SFX = {
-    TAP: "https://files.catbox.moe/5ehsef.mp3",
-    SLIDE: "https://files.catbox.moe/gwxcg0.mp3",
-    HOLD: "https://files.catbox.moe/h3e5ma.mp3",
-    HOLD_END: "https://files.catbox.moe/gwxcg0.mp3",
-    FLICK: "https://files.catbox.moe/gwxcg0.mp3" 
-};
+const SFX_SETS = [
+    {
+        name: "DEFAULT",
+        TAP: "https://files.catbox.moe/5ehsef.mp3",
+        SLIDE: "https://files.catbox.moe/gwxcg0.mp3",
+        HOLD: "https://files.catbox.moe/h3e5ma.mp3",
+        HOLD_END: "https://files.catbox.moe/gwxcg0.mp3",
+        FLICK: "https://files.catbox.moe/gwxcg0.mp3"
+    },
+    {
+        name: "DRUM",
+        TAP: "https://files.catbox.moe/jc4vn1.mp3", 
+        SLIDE: "https://files.catbox.moe/vqw5f5.mp3",
+        HOLD: "https://files.catbox.moe/jc4vn1.mp3",
+        HOLD_END: "https://files.catbox.moe/jc4vn1.mp3",
+        FLICK: "https://files.catbox.moe/vqw5f5.mp3"
+    },
+    {
+        name: "CLAP",
+        TAP: "https://files.catbox.moe/bfaa01.mp3", 
+        SLIDE: "https://files.catbox.moe/qcs95q.mp3",
+        HOLD: "https://files.catbox.moe/f946jf.mp3",
+        HOLD_END: "https://files.catbox.moe/qcs95q.mp3",
+        FLICK: "https://files.catbox.moe/qcs95q.mp3"
+    },
+];
+let currentSFXIndex = 0;
+let SFX = SFX_SETS[0];
 
 const SONGS = [
     { id: 0, title: "01.泥土裡的壞脾氣", color: "#66ff66", cover: "https://i.meee.com.tw/YCIig0r.jpg", src: "https://files.catbox.moe/n0otl1.mp3", preview: 10.4 },
     { id: 1, title: "02.無頭騎士序曲", color: "#ff4500", cover: "https://meee.com.tw/VJB7LBg.jpg", src: "https://files.catbox.moe/9aqtcj.mp3", preview: 14.4 },
     { id: 2, title: "03.鏽蝕的脈搏", color: "#8b4513", cover: "https://files.catbox.moe/xivzat.jpg", src: "https://files.catbox.moe/rqwk8s.mp3", preview: 10 },
-    { id: 3, title: "04.霧都點名簿", color: "#1e90ff", cover: "https://files.catbox.moe/axic1b.jpg", src: "https://files.catbox.moe/9mz87d.mp3", preview: 10 },
+    { id: 3, title: "04.霧都點名簿", color: "#232896", cover: "https://files.catbox.moe/axic1b.jpg", src: "https://files.catbox.moe/9mz87d.mp3", preview: 10 },
     { id: 4, title: "05.星盤下的謊言", color: "#ff0000", cover: "https://files.catbox.moe/4pis1o.jpg", src: "https://files.catbox.moe/tkok9u.mp3", preview: 10 },
     { id: 5, title: "06.泛黃的處方籤", color: "#eee8aa", cover: "https://files.catbox.moe/5wamgm.jpg", src: "https://files.catbox.moe/fyxcfi.mp3", preview: 10 },
-    { id: 6, title: "07.這麻煩有點大", color: "#9370db", cover: "https://files.catbox.moe/oi2lh5.jpg", src: "https://files.catbox.moe/g8dbzw.mp3", preview: 10 },
-    { id: 7, title: "08.絕對無菌的處刑曲", color: "#808080", cover: "https://files.catbox.moe/ishaxg.jpg", src: "https://files.catbox.moe/ffb3gz.mp3", preview: 10 },
+    { id: 6, title: "07.這麻煩有點大", color: "#9394E6", cover: "https://files.catbox.moe/oi2lh5.jpg", src: "https://files.catbox.moe/g8dbzw.mp3", preview: 10 },
+    { id: 7, title: "08.絕對無菌的處刑曲", color: "#85846A", cover: "https://files.catbox.moe/ishaxg.jpg", src: "https://files.catbox.moe/ffb3gz.mp3", preview: 10 },
     { id: 8, title: "09.真理跪拜於我", color: "#00008b", cover: "https://files.catbox.moe/q06wsw.jpg", src: "https://files.catbox.moe/8mo7mf.mp3", preview: 10 },
     { id: 9, title: "10.玻璃的恩典", color: "#87ceeb", cover: "https://files.catbox.moe/unqwk1.jpg", src: "https://files.catbox.moe/9lxu2s.mp3", preview: 10 },
     { id: 10, title: "11.易碎的明天", color: "#ffd700", cover: "https://files.catbox.moe/5mfu5q.jpg", src: "https://files.catbox.moe/4j2pty.mp3", preview: 10 },
-    { id: 11, title: "12.越界的代價", color: "#800080", cover: "https://files.catbox.moe/zmpmwk.jpg", src: "https://files.catbox.moe/kg60ar.mp3", preview: 10 },
+    { id: 11, title: "12.越界的代價", color: "#4C3E80", cover: "https://files.catbox.moe/zmpmwk.jpg", src: "https://files.catbox.moe/kg60ar.mp3", preview: 10 },
     { id: 12, title: "13.融入的藝術", color: "#ff69b4", cover: "https://files.catbox.moe/usm7nv.jpg", src: "https://files.catbox.moe/v2dt14.mp3", preview: 10 },
     { id: 13, title: "14.名為永恆的毒蘋果", color: "#800080", cover: "https://files.catbox.moe/2xbvom.jpg", src: "https://files.catbox.moe/5wtu1z.mp3", preview: 10 },
     { id: 14, title: "15.零層會議", color: "#333333", cover: "https://files.catbox.moe/bgpkld.jpg", src: "https://files.catbox.moe/mklbah.mp3", preview: 10 },
-    { id: 15, title: "16.最初的清晨", color: "#ffffff", cover: "https://files.catbox.moe/y6efl4.jpg", src: "https://files.catbox.moe/xcbk67.mp3", preview: 10 }
+    { id: 15, title: "16.最初的清晨", color: "#F5CC5B", cover: "https://files.catbox.moe/y6efl4.jpg", src: "https://files.catbox.moe/xcbk67.mp3", preview: 10 }
 ,{ id: 16, title: "Coming soon", color: "#ffffff", cover: "https://files.catbox.moe/ypzq8c.jpg", src: "", preview: 10 }
 ];
-
 const JSON_DB = {
     0: {
   "header": {
@@ -119448,16 +119512,48 @@ const JSON_DB = {
   ]
 }  // 16.最初的清晨
 };
-
 const STORAGE_KEY = 'nocturne_save_v6'; 
 let userOffset = parseInt(localStorage.getItem('nocturne_offset') || 0);
+let userSpeed = parseFloat(localStorage.getItem('nocturne_speed') || 1.0);
+let musicVol = parseFloat(localStorage.getItem('nocturne_mvol') || 1.0);
+let sfxVol = parseFloat(localStorage.getItem('nocturne_svol') || 1.0);
 
 function adjustOffset(delta) {
     userOffset += delta;
     if(userOffset > 200) userOffset = 200;
     if(userOffset < -200) userOffset = -200;
     localStorage.setItem('nocturne_offset', userOffset);
-    document.getElementById('offset-display').innerText = (userOffset > 0 ? "+" : "") + userOffset + " ms";
+    const display = document.getElementById('pause-offset-display');
+    if(display) display.innerText = (userOffset > 0 ? "+" : "") + userOffset + " ms";
+}
+
+function adjustSpeed(delta) {
+    userSpeed += delta;
+    userSpeed = Math.round(userSpeed * 10) / 10;
+    if(userSpeed < 0.5) userSpeed = 0.5;
+    if(userSpeed > 8.0) userSpeed = 8.0;
+    localStorage.setItem('nocturne_speed', userSpeed);
+    document.getElementById('speed-display').innerText = userSpeed.toFixed(1);
+    
+    if (gameState === 'PAUSE') {
+        let base = 2.0;
+        if (currentDiff === 'EASY') base = 2.2;
+        else if (currentDiff === 'NORMAL') base = 2.0;
+        else if (currentDiff === 'HARD') base = 1.6;
+        else if (currentDiff === 'MASTER') base = 1.3;
+        currentFallTime = base / userSpeed;
+    }
+}
+
+function updateVolume() {
+    musicVol = parseFloat(document.getElementById('vol-music').value);
+    sfxVol = parseFloat(document.getElementById('vol-sfx').value);
+    localStorage.setItem('nocturne_mvol', musicVol);
+    localStorage.setItem('nocturne_svol', sfxVol);
+    const bgm = document.getElementById('bgm');
+    const preview = document.getElementById('preview');
+    if(bgm) bgm.volume = musicVol;
+    if(preview) preview.volume = musicVol;
 }
 
 function saveHighScore(songId, diff, score, rank) {
@@ -119631,8 +119727,10 @@ function generateChart(jsonData, diff) {
     return gameNotes;
 }
 
+const PERSPECTIVE_TOP_SCALE = 0.5; // Top is 50% of bottom width
+
 let currentFallTime = 2.0; 
-const JUDGE_LINE_PCT = 0.70; 
+const JUDGE_LINE_PCT = 0.65; 
 const AUDIO_DELAY = 3.0; 
 const P_WIN = 0.08; const GR_WIN = 0.15; const GD_WIN = 0.25; 
 
@@ -119647,12 +119745,16 @@ let width, height;
 let activeNotes = [];
 let particles = [];
 let touchFeedback = []; 
+let hitEffects = [];
 let score = 0, combo = 0, maxCombo = 0;
 let scorePerNote = 0;
 let stats = { p:0, gr:0, gd:0, m:0 };
 let pTimer, pFade;
 let gameStartTime = 0;
 let isAudioPlaying = false;
+let countdownTimer = null;
+let pausedFrom = "HOME";
+let pausedTime = 0;
 
 window.onload = () => {
     canvas = document.getElementById('game');
@@ -119660,10 +119762,13 @@ window.onload = () => {
     ctx = canvas.getContext('2d');
     handleResize();
     window.addEventListener('resize', handleResize);
-    Object.keys(SFX).forEach(k => loadSFX(SFX[k], k));
+    loadSFXSet(SFX);
     initCarousel(); 
     updateHomeUI();
-    document.getElementById('offset-display').innerText = (userOffset > 0 ? "+" : "") + userOffset + " ms";
+    document.getElementById('pause-offset-display').innerText = (userOffset > 0 ? "+" : "") + userOffset + " ms";
+    document.getElementById('speed-display').innerText = userSpeed.toFixed(1);
+    document.getElementById('vol-music').value = musicVol;
+    document.getElementById('vol-sfx').value = sfxVol;
     loop();
     const bind = (evt) => inputZone.addEventListener(evt, handleInput, {passive:false});
     bind('mousedown'); bind('touchstart'); bind('touchmove'); bind('touchend'); bind('mouseup');
@@ -119679,9 +119784,43 @@ function handleResize() {
 async function loadSFX(url, key) {
     try { const res = await fetch(url); const buf = await res.arrayBuffer(); sfxBuffers[key] = await audioCtx.decodeAudioData(buf); } catch(e){}
 }
+
+async function loadSFXSet(set) {
+    await Promise.all(Object.keys(set).filter(k => k !== 'name').map(k => loadSFX(set[k], k)));
+}
+
 function playSFX(key) {
+    if (SFX.synth) {
+        triggerSynth(SFX.synth, key);
+        return;
+    }
     if(!sfxBuffers[key]) return;
-    const s = audioCtx.createBufferSource(); s.buffer = sfxBuffers[key]; s.connect(audioCtx.destination); s.start(0);
+    const s = audioCtx.createBufferSource();
+    const g = audioCtx.createGain();
+    s.buffer = sfxBuffers[key];
+    g.gain.value = sfxVol;
+    s.connect(g); g.connect(audioCtx.destination);
+    s.start(0);
+}
+
+function triggerSynth(style, key) {
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.connect(g); g.connect(audioCtx.destination);
+    g.gain.setValueAtTime(sfxVol * 0.5, now);
+    if (style === 'ELECTRO') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(key === 'FLICK' ? 880 : 440, now);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
+        g.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now); osc.stop(now + 0.1);
+    } else {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(key === 'FLICK' ? 660 : 330, now);
+        g.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now); osc.stop(now + 0.2);
+    }
 }
 
 function initCarousel() { 
@@ -119710,6 +119849,7 @@ function updateHomeUI() {
         else if (dist > 1) el.classList.add('c-hidden-right');
     });
     document.getElementById('bg-layer').style.backgroundImage = `url(${SONGS[currentSongIdx].cover})`;
+    document.querySelector('.pause-icon').innerText = "⚙";
     startPreview();
 }
 
@@ -119724,7 +119864,7 @@ function changeSong(i) {
 function startPreview() {
     stopPreview();
     const aud = document.getElementById('preview');
-    aud.src = SONGS[currentSongIdx].src; aud.currentTime = SONGS[currentSongIdx].preview; aud.volume = 0;
+    aud.src = SONGS[currentSongIdx].src; aud.currentTime = SONGS[currentSongIdx].preview; aud.volume = musicVol;
     const cycle = () => {
         aud.currentTime = SONGS[currentSongIdx].preview; aud.play().catch(()=>{});
         let v=0;
@@ -119745,15 +119885,23 @@ function startGame(diff) {
     stopPreview();
     currentDiff = diff;
     
+    if (diff === 'MASTER') {
+        document.documentElement.style.setProperty('--master-color', SONGS[currentSongIdx].color);
+        document.getElementById('master-layer').style.opacity = 0.5;
+    } else {
+        document.getElementById('master-layer').style.opacity = 0;
+    }
+
     if (diff === 'EASY') currentFallTime = 2.2;
     else if (diff === 'NORMAL') currentFallTime = 2.0;
     else if (diff === 'HARD') currentFallTime = 1.6; 
     else if (diff === 'MASTER') currentFallTime = 1.3; 
+    currentFallTime /= userSpeed;
 
     const song = SONGS[currentSongIdx];
     const notes = generateChart(JSON_DB[song.id], diff);
     activeNotes = notes.map(n => ({...n, songColor: song.color}));
-    score=0; combo=0; maxCombo=0; stats={p:0,gr:0,gd:0,m:0}; particles=[]; touchFeedback=[];
+    score=0; combo=0; maxCombo=0; stats={p:0,gr:0,gd:0,m:0}; particles=[]; touchFeedback=[]; hitEffects=[];
     
     scorePerNote = activeNotes.length > 0 ? (1000000 / activeNotes.length) : 0;
 
@@ -119762,14 +119910,15 @@ function startGame(diff) {
     
     document.getElementById('screen-home').classList.add('hidden');
     document.getElementById('screen-home').classList.remove('active-ui');
+    document.querySelector('.pause-icon').innerText = "||";
     const cd = document.getElementById('countdown');
     cd.style.opacity = 1; gameState = "COUNTDOWN";
     let c = 3; cd.innerText = c;
-    let inv = setInterval(() => {
+    countdownTimer = setInterval(() => {
         c--;
         if(c>0) cd.innerText=c;
         else {
-            clearInterval(inv); cd.innerText=""; cd.style.opacity=0;
+            clearInterval(countdownTimer); cd.innerText=""; cd.style.opacity=0;
             document.getElementById('screen-hud').classList.remove('hidden');
             gameState="PLAY";
             const bgm = document.getElementById('bgm');
@@ -119784,9 +119933,24 @@ function getSnakeOffset(t, startTime) {
     return Math.sin((t - startTime) * 5) * 0.15; 
 }
 
+async function changeSFX(dir) {
+    currentSFXIndex = (currentSFXIndex + dir + SFX_SETS.length) % SFX_SETS.length;
+    SFX = SFX_SETS[currentSFXIndex];
+    document.getElementById('sfx-display').innerText = SFX.name;
+    await loadSFXSet(SFX);
+    playSFX('TAP');
+}
+
+function getPerspective(pct) {
+    const s = PERSPECTIVE_TOP_SCALE + (1 - PERSPECTIVE_TOP_SCALE) * pct;
+    const lw = width * s;
+    const xo = (width - lw) / 2;
+    return { s, lw, xo };
+}
+
 function loop() {
     requestAnimationFrame(loop);
-    if(gameState !== "PLAY" && gameState !== "COUNTDOWN" && gameState !== "RESULT") { 
+    if(gameState !== "PLAY" && gameState !== "COUNTDOWN" && gameState !== "RESULT" && gameState !== "RESUME_WAIT") { 
         if(gameState === "HOME" || gameState === "PAUSE") ctx.clearRect(0,0,width,height);
         return; 
     }
@@ -119796,17 +119960,25 @@ function loop() {
         tf.life -= 0.08;
         if(tf.life > 0) {
             ctx.beginPath(); ctx.arc(tf.x, tf.y, 60 * (1-tf.life), 0, Math.PI*2);
-            ctx.strokeStyle = `rgba(255,255,255,${tf.life*0.5})`; ctx.stroke();
+            ctx.strokeStyle = `rgba(255,255,255,${tf.life})`; ctx.stroke();
         } else { touchFeedback.splice(i,1); }
     });
 
     const JUDGE_Y = height * JUDGE_LINE_PCT;
     const songColor = SONGS[currentSongIdx].color;
 
-    ctx.strokeStyle = "rgba(255,255,255,0.05)"; ctx.lineWidth = 1;
-    for(let i=0; i<=10; i++) { 
-        let x = width * (0.1 + i * 0.08); 
-        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,height); ctx.stroke(); 
+    const topWidth = width * PERSPECTIVE_TOP_SCALE;
+    const topXOffset = (width - topWidth) / 2;
+    ctx.strokeStyle = "rgba(255,255,255,0.1)";
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+        const xPct = 0.1 + i * 0.08;
+        const topX = topXOffset + xPct * topWidth;
+        const bottomX = xPct * width;
+        ctx.beginPath();
+        ctx.moveTo(topX, 0);
+        ctx.lineTo(bottomX, JUDGE_Y);
+        ctx.stroke();
     }
     
     ctx.shadowBlur = 15; ctx.shadowColor = songColor;
@@ -119814,12 +119986,38 @@ function loop() {
     ctx.beginPath(); ctx.moveTo(0, JUDGE_Y); ctx.lineTo(width, JUDGE_Y); ctx.stroke();
     ctx.shadowBlur = 0;
 
+    // Draw Hit Effects
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    hitEffects.forEach((he, i) => {
+        he.life -= 0.05;
+        if(he.life > 0) {
+            ctx.globalAlpha = he.life * 0.5;
+            ctx.shadowBlur = 60;
+            ctx.shadowColor = he.color;
+            ctx.fillStyle = he.color;
+            ctx.beginPath(); ctx.ellipse(he.x, he.y, 80 * he.life, 20 * he.life, 0, 0, Math.PI * 2); ctx.fill();
+            
+            ctx.globalAlpha = he.life;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#fff";
+            ctx.fillStyle = "#fff";
+            ctx.beginPath(); ctx.ellipse(he.x, he.y, 40 * he.life, 8 * he.life, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+        } else {
+            hitEffects.splice(i, 1);
+        }
+    });
+    ctx.restore();
+
     if(gameState==="COUNTDOWN") return;
     
     const bgm = document.getElementById('bgm');
     let rawTime;
     
-    if (isAudioPlaying) {
+    if (gameState === "RESUME_WAIT") {
+        rawTime = pausedTime;
+    } else if (isAudioPlaying) {
         rawTime = bgm.currentTime;
         if(bgm.ended) { showResult(); return; }
     } else {
@@ -119839,9 +120037,11 @@ function loop() {
         const fallPct = 1 - (dt / currentFallTime);
         if(fallPct < -0.2) return; 
 
+        const { s: scale, lw: currentLaneWidth, xo: xOffset } = getPerspective(fallPct);
         const ny = fallPct * JUDGE_Y;
-        const nx = n.xPct * width;
-        const nw = width * 0.12; const nh = height * 0.03; 
+        const nx = xOffset + n.xPct * currentLaneWidth;
+        const nw = (width * 0.155) * scale;
+        const nh = (height * 0.038) * scale; //音符高度
 
         if(dt < -GD_WIN && !n.hit && !n.holding) {
             n.missed = true; combo=0; stats.m++; triggerJudge("MISS", "var(--c-miss)"); updateHUD();
@@ -119850,34 +120050,66 @@ function loop() {
         // --- DRAW HOLD BODY ---
         if((n.type===2 || n.type===6) && n.d>0) {
             const tailPct = 1 - ((n.t + n.d - currentTime) / currentFallTime);
-            const ty = tailPct * JUDGE_Y;
-            let hy = n.holding ? JUDGE_Y : ny;
+            let startPct = n.holding ? 1.0 : fallPct; 
+            let endPct = tailPct;
             
-            if(hy > ty) { 
+            // Clip to screen
+            let visibleStartPct = Math.min(startPct, 1.5);
+            let visibleEndPct = Math.max(0, endPct);
+
+            if(visibleStartPct > visibleEndPct) { 
                 if (n.type === 2) {
-                    let drawY = Math.max(0, ty); let drawH = hy - drawY;
-                    if (drawH > 0) {
-                        ctx.fillStyle = "rgba(255,255,255,0.2)"; ctx.fillRect(nx-nw/2, drawY, nw, drawH);
-                        ctx.fillStyle = songColor; ctx.fillRect(nx-2, drawY, 4, drawH);
-                    }
-                } else if (n.type === 6) {
+                    // Perspective Hold Body
+                    const bottom = getPerspective(visibleStartPct);
+                    const top = getPerspective(visibleEndPct);
+                    
+                    const bx = bottom.xo + n.xPct * bottom.lw;
+                    const by = visibleStartPct * JUDGE_Y;
+                    const bw = (width * 0.155) * bottom.s;
+                    
+                    const tx = top.xo + n.xPct * top.lw;
+                    const ty = visibleEndPct * JUDGE_Y;
+                    const tw = (width * 0.155) * top.s;
+                    
                     ctx.fillStyle = "rgba(255,255,255,0.3)";
-                    let step = 5; 
-                    for (let sy = Math.max(0, ty); sy < hy; sy += step) {
-                        let relativeY = sy / JUDGE_Y; 
-                        let timeAtY = currentTime + (1 - relativeY) * currentFallTime; 
-                        let offX = getSnakeOffset(timeAtY, n.t);
-                        let sx = (n.xPct + offX) * width;
+                    ctx.beginPath(); ctx.moveTo(bx - bw/2, by); ctx.lineTo(bx + bw/2, by);
+                    ctx.lineTo(tx + tw/2, ty); ctx.lineTo(tx - tw/2, ty); ctx.fill();
+                    
+                    ctx.fillStyle = songColor;
+                    ctx.beginPath(); ctx.moveTo(bx - 2*bottom.s, by); ctx.lineTo(bx + 2*bottom.s, by);
+                    ctx.lineTo(tx + 2*top.s, ty); ctx.lineTo(tx - 2*top.s, ty); ctx.fill();
+
+                } else if (n.type === 6) {
+                    // Snake Hold
+                    const stepCount = 30; 
+                    const pctStep = (visibleStartPct - visibleEndPct) / stepCount;
+                    
+                    ctx.fillStyle = "rgba(255,255,255,0.3)";
+                    for (let i = 0; i < stepCount; i++) {
+                        let p1 = visibleStartPct - i * pctStep;
+                        let p2 = visibleStartPct - (i+1) * pctStep;
+                        let t1 = currentTime + (1 - p1) * currentFallTime;
+                        let t2 = currentTime + (1 - p2) * currentFallTime;
+                        let off1 = getSnakeOffset(t1, n.t);
+                        let off2 = getSnakeOffset(t2, n.t);
+                        let persp1 = getPerspective(p1);
+                        let persp2 = getPerspective(p2);
+                        let x1 = persp1.xo + (n.xPct + off1) * persp1.lw;
+                        let w1 = (width * 0.155) * persp1.s;
+                        let y1 = p1 * JUDGE_Y;
+                        let x2 = persp2.xo + (n.xPct + off2) * persp2.lw;
+                        let w2 = (width * 0.155) * persp2.s;
+                        let y2 = p2 * JUDGE_Y;
                         
-                        ctx.fillRect(sx - nw/2, sy, nw, step);
-                        ctx.fillStyle = songColor; ctx.fillRect(sx - 2, sy, 4, step);
-                        ctx.fillStyle = "rgba(255,255,255,0.3)";
+                        ctx.beginPath(); ctx.moveTo(x1 - w1/2, y1); ctx.lineTo(x1 + w1/2, y1);
+                        ctx.lineTo(x2 + w2/2, y2); ctx.lineTo(x2 - w2/2, y2); ctx.fill();
                     }
                 }
             }
             if(n.holding && currentTime > n.t + n.d) {
                 n.hit=true; n.missed=true; addScore(1.0); combo++; triggerJudge("PERFECT", "var(--c-perfect)"); updateHUD();
                 playSFX('HOLD_END');
+                hitEffects.push({x: nx, y: JUDGE_Y, life: 1, color: songColor});
                 n.holdingTouchId = null; 
             }
         }
@@ -119885,59 +120117,137 @@ function loop() {
         // --- DRAW NOTE HEAD ---
         if(!n.hit && !n.holding && ny < height + 50) {
             if(ny > -50) { 
-                ctx.shadowBlur = 20; ctx.shadowColor = songColor;
+                ctx.shadowBlur = 20 * scale; ctx.shadowColor = songColor;
                 
                 let drawX = nx;
                 if (n.type === 6) {
                     let offX = getSnakeOffset(n.t, n.t); 
-                    drawX = (n.xPct + offX) * width;
+                    drawX = xOffset + (n.xPct + offX) * currentLaneWidth;
                 }
 
                 if (n.type === 3) {
-                    // Slide
-                    ctx.save(); ctx.translate(drawX, ny); ctx.rotate(Math.PI / 4);
-                    let sz = nw * 0.35; ctx.fillStyle = "#fff"; ctx.fillRect(-sz/2, -sz/2, sz, sz);
-                    ctx.fillStyle = songColor; let inn = sz * 0.6; ctx.fillRect(-inn/2, -inn/2, inn, inn);
-                    ctx.restore();
-                } 
-                else if (n.type >= 4 && n.type <= 8 && n.type !== 6) {
-                    // Flick
-                    let tSz = nw * 0.65; 
-                    ctx.save(); ctx.translate(drawX, ny);
+                    // Slide - Perspective Diamond (Flat)
+                    const sNw = nw * 0.8;
+                    const sNh = nh * 0.8;
+                    const yTop = ny - sNh/2;
+                    const yBot = ny + sNh/2;
                     
                     ctx.beginPath();
-                    if (n.type === 4) { ctx.moveTo(-tSz/2, 0); ctx.lineTo(tSz/2, -tSz/2); ctx.lineTo(tSz/2, tSz/2); }
-                    else if (n.type === 5) { ctx.moveTo(tSz/2, 0); ctx.lineTo(-tSz/2, -tSz/2); ctx.lineTo(-tSz/2, tSz/2); }
-                    else if (n.type === 7) { ctx.moveTo(0, -tSz/2); ctx.lineTo(-tSz/2, tSz/2); ctx.lineTo(tSz/2, tSz/2); }
-                    else if (n.type === 8) { ctx.moveTo(0, tSz/2); ctx.lineTo(-tSz/2, -tSz/2); ctx.lineTo(tSz/2, -tSz/2); }
+                    ctx.moveTo(drawX, yTop); // Top Center
+                    ctx.lineTo(drawX + sNw/2, ny); // Right
+                    ctx.lineTo(drawX, yBot); // Bottom Center
+                    ctx.lineTo(drawX - sNw/2, ny); // Left
                     ctx.closePath();
+                    
+                    // 3. 滑鍵 (Slide/Drag) - 全白，白光暈
+                    ctx.shadowBlur = 20 * scale; 
+                    ctx.shadowColor = "#ffffff"; // White Halo
+                    ctx.fillStyle = "#ffffff"; 
+                    ctx.fill();
+                } 
+                else if (n.type >= 4 && n.type <= 8 && n.type !== 6) {
+                    // Flick - Perspective Arrow
+                    const yTop = ny - nh/2;
+                    const yBot = ny + nh/2;
+                    const pTop = getPerspective(yTop / JUDGE_Y);
+                    const pBot = getPerspective(yBot / JUDGE_Y);
+                    
+                    const wTop = (width * 0.155) * pTop.s * 0.9; 
+                    const wBot = (width * 0.155) * pBot.s * 0.9;
+                    
+                    const xTop = pTop.xo + n.xPct * pTop.lw;
+                    const xBot = pBot.xo + n.xPct * pBot.lw;
 
-                    ctx.shadowBlur = 20; ctx.shadowColor = songColor;
-                    ctx.lineWidth = 11; ctx.lineJoin = "round"; ctx.strokeStyle = "#fff"; ctx.stroke();
-                    ctx.shadowBlur = 0; ctx.fillStyle = songColor; ctx.fill();
-                    ctx.restore();
+                    const drawArrow = (scaleFactor) => {
+                        const cx = (xTop + xBot) / 2;
+                        const cy = (yTop + yBot) / 2;
+                        const lx = (x) => cx + (x - cx) * scaleFactor;
+                        const ly = (y) => cy + (y - cy) * scaleFactor;
 
-                } else if (n.type === 1) { 
-                    // Big Tap / Double - ADDED GLOW HERE
+                        ctx.beginPath();
+                        if (n.type === 7) { // Up
+                            ctx.moveTo(lx(xTop), ly(yTop)); ctx.lineTo(lx(xBot + wBot/2), ly(yBot)); ctx.lineTo(lx(xBot - wBot/2), ly(yBot));
+                        } else if (n.type === 8) { // Down
+                            ctx.moveTo(lx(xBot), ly(yBot)); ctx.lineTo(lx(xTop + wTop/2), ly(yTop)); ctx.lineTo(lx(xTop - wTop/2), ly(yTop));
+                        } else if (n.type === 4) { // Left
+                            const midY = (yTop + yBot) / 2; const midX = ( (xTop - wTop/2) + (xBot - wBot/2) ) / 2;
+                            ctx.moveTo(lx(midX), ly(midY)); ctx.lineTo(lx(xTop + wTop/2), ly(yTop)); ctx.lineTo(lx(xBot + wBot/2), ly(yBot));
+                        } else if (n.type === 5) { // Right
+                            const midY = (yTop + yBot) / 2; const midX = ( (xTop + wTop/2) + (xBot + wBot/2) ) / 2;
+                            ctx.moveTo(lx(midX), ly(midY)); ctx.lineTo(lx(xTop - wTop/2), ly(yTop)); ctx.lineTo(lx(xBot - wBot/2), ly(yBot));
+                        }
+                        ctx.closePath();
+                    };
+
+                    // 2. 上/下/左/右滑鍵 (Flick) - 歌曲色填充，加粗白框，歌曲色光暈
+                    drawArrow(1.1);
+                    ctx.shadowBlur = 20 * scale; 
+                    ctx.shadowColor = "#ffffff"; // Song Color Halo
+                    ctx.fillStyle = songColor; // Song Color Fill
+                    ctx.fill();
+                    ctx.lineWidth = 4 * scale; 
+                    ctx.strokeStyle = "#ffffff"; // White Border
+                    ctx.stroke();
+                } else {
+                    // Tap / Hold Head / Big Tap - Perspective Trapezoid (Bar)
+                    const yTop = ny - nh/2;
+                    const yBot = ny + nh/2;
+                    const pTop = getPerspective(yTop / JUDGE_Y);
+                    const pBot = getPerspective(yBot / JUDGE_Y);
+                    const wTop = (width * 0.155) * pTop.s;
+                    const wBot = (width * 0.155) * pBot.s;
+                    const xTop = pTop.xo + n.xPct * pTop.lw;
+                    const xBot = pBot.xo + n.xPct * pBot.lw;
+
+                    if (n.type === 1) { 
+                    // Big Tap - Stroke
                     ctx.save();
-                    ctx.shadowBlur = 25; ctx.shadowColor = "rgba(255,255,255,0.9)"; // White Halo
+                    ctx.shadowBlur = 25 * scale; ctx.shadowColor = "rgba(255,255,255,0.9)"; // White Halo
                     ctx.fillStyle = "#000"; ctx.strokeStyle = songColor; ctx.lineWidth = 5;
-                    ctx.fillRect(drawX-nw/2, ny-nh/2, nw, nh); ctx.strokeRect(drawX-nw/2, ny-nh/2, nw, nh);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(xTop - wTop/2, yTop); ctx.lineTo(xTop + wTop/2, yTop);
+                    ctx.lineTo(xBot + wBot/2, yBot); ctx.lineTo(xBot - wBot/2, yBot);
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+
+                    // Inner highlight
+                    ctx.fillStyle = "rgba(255,255,255,0.8)";
+                    ctx.beginPath();
+                    ctx.moveTo(xTop - wTop/4, yTop + nh*0.25); ctx.lineTo(xTop + wTop/4, yTop + nh*0.25);
+                    ctx.lineTo(xBot + wBot/4, yBot - nh*0.25); ctx.lineTo(xBot - wBot/4, yBot - nh*0.25);
+                    ctx.fill();
                     ctx.restore();
                 } else {
-                    // Tap
-                    ctx.fillStyle = "#fff"; ctx.fillRect(drawX-nw/2, ny-nh/2, nw, nh);
+                    // Normal Tap / Hold Head
+                    ctx.fillStyle = "#fff"; 
+                    ctx.beginPath();
+                    ctx.moveTo(xTop - wTop/2, yTop); ctx.lineTo(xTop + wTop/2, yTop);
+                    ctx.lineTo(xBot + wBot/2, yBot); ctx.lineTo(xBot - wBot/2, yBot);
+                    ctx.fill();
+
+                    // Colored strip
+                    ctx.fillStyle = songColor;
+                    ctx.beginPath();
+                    ctx.moveTo(xTop - wTop/2 + 3*scale, yTop + nh*0.3); 
+                    ctx.lineTo(xTop + wTop/2 - 3*scale, yTop + nh*0.3);
+                    ctx.lineTo(xBot + wBot/2 - 3*scale, yBot - nh*0.3); 
+                    ctx.lineTo(xBot - wBot/2 + 3*scale, yBot - nh*0.3);
+                    ctx.fill();
+                }
                 }
                 ctx.shadowBlur = 0;
             }
         }
 
         if(n.holding) {
-             let holdX = nx;
+             // Fixed point logic: Use the lane center at judge line (perspective 1.0)
+             const pJudge = getPerspective(1.0);
+             let currentX = n.xPct;
              if (n.type === 6) {
-                 let offX = getSnakeOffset(currentTime, n.t);
-                 holdX = (n.xPct + offX) * width;
+                 currentX += getSnakeOffset(currentTime, n.t);
              }
+             let holdX = pJudge.xo + currentX * pJudge.lw;
              spawnParticles(holdX, JUDGE_Y, songColor, 2);
              ctx.shadowBlur=20; ctx.shadowColor=songColor;
              ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(holdX, JUDGE_Y, 20, 0, Math.PI*2); ctx.fill();
@@ -119956,6 +120266,7 @@ function addScore(multiplier) {
 }
 
 function handleInput(e) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
     if(gameState !== "PLAY") return;
     if(e.cancelable) e.preventDefault();
     const touches = e.changedTouches ? Array.from(e.changedTouches) : [e];
@@ -119965,8 +120276,9 @@ function handleInput(e) {
     const time = rawTime - (userOffset / 1000); 
     
     const rect = inputZone.getBoundingClientRect();
-    const NORMAL_X_WIN = width * 0.18; 
-    const SLIDE_X_WIN = width * 0.18; 
+    const NORMAL_X_WIN = width * 0.25; 
+    const NORMAL_Y_WIN = width * 0.15; 
+    const SLIDE_X_WIN = width * 0.05; 
 
     touches.forEach(t => {
         const tx = t.clientX - rect.left;
@@ -120022,6 +120334,7 @@ function handleInput(e) {
 
                     if(isStartHit && !n.holding) {
                         playSFX('HOLD'); n.holding = true;
+                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
                         n.holdingTouchId = id;
                         break; 
                     }
@@ -120035,6 +120348,7 @@ function handleInput(e) {
                     if (type === 'touchstart' || type === 'mousedown' || type === 'touchmove') {
                         playSFX('SLIDE'); n.hit=true; 
                         addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)");
+                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
                         combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 8); updateHUD();
                     }
                 }
@@ -120043,16 +120357,18 @@ function handleInput(e) {
             else if (n.type >= 4 && n.type <= 8) {
                  if (Math.abs(tx - targetX) < NORMAL_X_WIN && dt <= GD_WIN) {
                      let triggered = false;
+                     const flickThresh = width * 0.02;
                      if (type === 'touchmove' || type === 'touchend' || type === 'mouseup') {
-                         if (n.type === 4 && deltaX < -15) triggered = true; 
-                         else if (n.type === 5 && deltaX > 15) triggered = true; 
-                         else if (n.type === 7 && deltaY < -15) triggered = true; 
-                         else if (n.type === 8 && deltaY > 15) triggered = true; 
+                         if (n.type === 4 && deltaX < -flickThresh) triggered = true; 
+                         else if (n.type === 5 && deltaX > flickThresh) triggered = true; 
+                         else if (n.type === 7 && deltaY < -flickThresh) triggered = true; 
+                         else if (n.type === 8 && deltaY > flickThresh) triggered = true; 
                      }
                      
                      if (triggered) {
                         playSFX('FLICK'); n.hit=true; 
                         addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)");
+                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
                         combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 20); updateHUD();
                         break; 
                      }
@@ -120066,6 +120382,7 @@ function handleInput(e) {
                          if (dt < P_WIN) { addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)"); }
                          else if (dt < GR_WIN) { addScore(0.8); stats.gr++; triggerJudge("GREAT", "var(--c-great)"); }
                          else { addScore(0.5); stats.gd++; triggerJudge("GOOD", "var(--c-good)"); }
+                         hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
                          combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 15); updateHUD();
                          break;
                     }
@@ -120112,13 +120429,37 @@ function updateHUD() {
     if(combo > 1) { cEl.innerText = combo; cEl.classList.remove('bump'); void cEl.offsetWidth; cEl.classList.add('bump'); } else { cEl.innerText = ""; }
     if(combo > maxCombo) maxCombo = combo;
 }
-function pauseGame() { if(gameState==="PLAY"){gameState="PAUSE"; document.getElementById('bgm').pause(); document.getElementById('screen-pause').classList.remove('hidden');}}
+function pauseGame() { 
+    if(gameState==="PLAY" || gameState==="COUNTDOWN" || gameState==="HOME"){
+        pausedFrom = gameState;
+        if(gameState === "COUNTDOWN") {
+            clearInterval(countdownTimer);
+            pausedFrom = "PLAY";
+        }
+        pausedTime = document.getElementById('bgm').currentTime;
+        gameState="PAUSE"; 
+        document.getElementById('bgm').pause(); 
+        document.getElementById('screen-pause').classList.remove('hidden');
+    }
+}
 function resumeGame() { 
-    gameState="PLAY"; 
-    const bgm = document.getElementById('bgm');
-    const elapsed = (performance.now()-gameStartTime)/1000 - AUDIO_DELAY;
-    if(elapsed >= 0) bgm.play();
     document.getElementById('screen-pause').classList.add('hidden');
+    if (pausedFrom === "HOME") {
+        gameState = "HOME";
+        startPreview();
+        return;
+    }
+    
+    // 1 second wait on current frame
+    gameState = "RESUME_WAIT";
+    
+    setTimeout(() => {
+        gameState = "PLAY";
+        const bgm = document.getElementById('bgm');
+        // Recalculate start time based on current audio time to ensure sync
+        gameStartTime = performance.now() - (bgm.currentTime + AUDIO_DELAY) * 1000;
+        bgm.play().catch(()=>{});
+    }, 1000);
 }
 function quitGame() {
     gameState="HOME"; stopPreview(); document.getElementById('bgm').pause(); isAudioPlaying = false;
@@ -120126,6 +120467,7 @@ function quitGame() {
     document.getElementById('screen-pause').classList.add('hidden');
     document.getElementById('screen-result').classList.add('hidden');
     document.getElementById('screen-home').classList.remove('hidden'); document.getElementById('screen-home').classList.add('active-ui');
+    document.getElementById('master-layer').style.opacity = 0;
     initCarousel(); updateHomeUI();
 }
 function showResult() {
@@ -120146,6 +120488,7 @@ function showResult() {
     const rankEl = document.getElementById('res-rank');
     rankEl.innerText = r;
     rankEl.className = ""; 
+    document.getElementById('master-layer').style.opacity = 0;
     if(r === "SS") rankEl.classList.add("rank-SS");
     
     saveHighScore(SONGS[currentSongIdx].id, currentDiff, score, r);
