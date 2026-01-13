@@ -311,10 +311,10 @@ const SFX_SETS = [
     {
         name: "CLAP",
         TAP: "https://files.catbox.moe/bfaa01.mp3", 
-        SLIDE: "https://files.catbox.moe/15kh28.mp3",
+        SLIDE: "https://files.catbox.moe/qcs95q.mp3",
         HOLD: "https://files.catbox.moe/f946jf.mp3",
-        HOLD_END: "https://files.catbox.moe/15kh28.mp3",
-        FLICK: "https://files.catbox.moe/15kh28.mp3"
+        HOLD_END: "https://files.catbox.moe/qcs95q.mp3",
+        FLICK: "https://files.catbox.moe/qcs95q.mp3"
     },
 ];
 let currentSFXIndex = 0;
@@ -120186,7 +120186,7 @@ function loop() {
                     ctx.shadowColor = "#ffffff"; // Song Color Halo
                     ctx.fillStyle = songColor; // Song Color Fill
                     ctx.fill();
-                    ctx.lineWidth = 8 * scale; 
+                    ctx.lineWidth = 4 * scale; 
                     ctx.strokeStyle = "#ffffff"; // White Border
                     ctx.stroke();
                 } else {
