@@ -190,6 +190,9 @@
         input[type=range]::-webkit-slider-thumb { height: 4vh; width: 4vh; border-radius: 50%; background: var(--c-perfect); cursor: pointer; -webkit-appearance: none; margin-top: -1.75vh; box-shadow: 0 0 10px var(--c-perfect); }
         input[type=range]::-moz-range-track { width: 100%; height: 0.5vh; cursor: pointer; background: rgba(255,255,255,0.3); border-radius: 1vh; }
         input[type=range]::-moz-range-thumb { height: 4vh; width: 4vh; border: none; border-radius: 50%; background: var(--c-perfect); cursor: pointer; box-shadow: 0 0 10px var(--c-perfect); }
+
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4vw; width: 100%; margin: 2vh 0; }
+        .col { display: flex; flex-direction: column; gap: 2vh; align-items: center; width: 100%; }
     </style>
 </head>
 <body>
@@ -232,48 +235,58 @@
     <div id="screen-pause" class="screen hidden active-ui">
         <div class="modal">
             <h2 style="color:var(--c-perfect); font-weight:400; letter-spacing:0.2em; margin-bottom:3vh; font-size: 5vh;">PAUSED</h2>
-            <div class="settings-group">
-                <div class="setting-row">
-                    <span style="width: 15vh; text-align: right;">SPEED</span>
-                    <button class="btn-offset" onclick="adjustSpeed(-0.1)">-</button>
-                    <span id="speed-display" style="width: 10vh; text-align: center;">1.0</span>
-                    <button class="btn-offset" onclick="adjustSpeed(0.1)">+</button>
+            <div class="settings-grid">
+                <div class="col">
+                    <div class="setting-row">
+                        <span style="width: 15vh; text-align: right;">SPEED</span>
+                        <button class="btn-offset" onclick="adjustSpeed(-0.1)">-</button>
+                        <span id="speed-display" style="width: 10vh; text-align: center;">1.0</span>
+                        <button class="btn-offset" onclick="adjustSpeed(0.1)">+</button>
+                    </div>
+                    <div class="setting-row">
+                        <span style="width: 15vh; text-align: right;">OFFSET</span>
+                        <button class="btn-offset" onclick="adjustOffset(-5)">-</button>
+                        <span id="pause-offset-display" style="width: 10vh; text-align: center;">0 ms</span>
+                        <button class="btn-offset" onclick="adjustOffset(5)">+</button>
+                    </div>
+                    <div class="setting-row">
+                        <span style="width: 15vh; text-align: right;">MUSIC</span>
+                        <input type="range" id="vol-music" min="0" max="1" step="0.1" value="1" onchange="updateVolume()" style="width: 20vh;">
+                    </div>
+                    <div class="setting-row">
+                        <span style="width: 15vh; text-align: right;">SFX VOL</span>
+                        <input type="range" id="vol-sfx" min="0" max="1" step="0.1" value="1" onchange="updateVolume()" style="width: 20vh;">
+                    </div>
                 </div>
-                <div class="setting-row">
-                    <span style="width: 15vh; text-align: right;">OFFSET</span>
-                    <button class="btn-offset" onclick="adjustOffset(-5)">-</button>
-                    <span id="pause-offset-display" style="width: 10vh; text-align: center;">0 ms</span>
-                    <button class="btn-offset" onclick="adjustOffset(5)">+</button>
-                </div>
-                <div class="setting-row">
-                    <span style="width: 15vh; text-align: right;">JUDGE X</span>
-                    <button class="btn-offset" onclick="adjustJudgeRangeX(-0.01)">-</button>
-                    <span id="judge-x-display" style="width: 10vh; text-align: center;">25%</span>
-                    <button class="btn-offset" onclick="adjustJudgeRangeX(0.01)">+</button>
-                </div>
-                <div class="setting-row">
-                    <span style="width: 15vh; text-align: right;">JUDGE Y</span>
-                    <button class="btn-offset" onclick="adjustJudgeRangeY(-0.01)">-</button>
-                    <span id="judge-y-display" style="width: 10vh; text-align: center;">15%</span>
-                    <button class="btn-offset" onclick="adjustJudgeRangeY(0.01)">+</button>
-                </div>
-                <div class="setting-row">
-                    <span style="width: 15vh; text-align: right;">SFX</span>
-                    <button class="btn-offset" onclick="changeSFX(-1)">&lt;</button>
-                    <span id="sfx-display" style="width: 15vh; text-align: center; font-size: 2.5vh;">DEFAULT</span>
-                    <button class="btn-offset" onclick="changeSFX(1)">&gt;</button>
-                </div>
-                <div class="setting-row">
-                    <span style="width: 15vh; text-align: right;">MUSIC</span>
-                    <input type="range" id="vol-music" min="0" max="1" step="0.1" value="1" onchange="updateVolume()" style="width: 35vh;">
-                    <span style="width: 4vh"></span>
-                </div>
-                <div class="setting-row">
-                    <span style="width: 15vh; text-align: right;">SFX</span>
-                    <input type="range" id="vol-sfx" min="0" max="1" step="0.1" value="1" onchange="updateVolume()" style="width: 35vh;">
-                    <span style="width: 4vh"></span>
+                <div class="col">
+                    <div class="setting-row">
+                        <span style="width: 15vh; text-align: right;">LINE Y</span>
+                        <button class="btn-offset" onclick="adjustJudgeLineHeight(-0.01)">-</button>
+                        <span id="judge-line-display" style="width: 10vh; text-align: center;">65%</span>
+                        <button class="btn-offset" onclick="adjustJudgeLineHeight(0.01)">+</button>
+                    </div>
+                    <div class="setting-row">
+                        <span style="width: 15vh; text-align: right;">JUDGE X</span>
+                        <button class="btn-offset" onclick="adjustJudgeRangeX(-0.01)">-</button>
+                        <span id="judge-x-display" style="width: 10vh; text-align: center;">25%</span>
+                        <button class="btn-offset" onclick="adjustJudgeRangeX(0.01)">+</button>
+                    </div>
+                    <div class="setting-row">
+                        <span style="width: 15vh; text-align: right;">JUDGE Y</span>
+                        <button class="btn-offset" onclick="adjustJudgeRangeY(-0.01)">-</button>
+                        <span id="judge-y-display" style="width: 10vh; text-align: center;">30%</span>
+                        <button class="btn-offset" onclick="adjustJudgeRangeY(0.01)">+</button>
+                    </div>
+                    <div class="setting-row">
+                        <span style="width: 15vh; text-align: right;">SFX SET</span>
+                        <button class="btn-offset" onclick="changeSFX(-1)">&lt;</button>
+                        <span id="sfx-display" style="width: 15vh; text-align: center; font-size: 2.5vh;">DEFAULT</span>
+                        <button class="btn-offset" onclick="changeSFX(1)">&gt;</button>
+                    </div>
                 </div>
             </div>
+
+            
             <button class="btn-modal" onclick="resumeGame()">RESUME</button>
             <button class="btn-modal" onclick="quitGame()">EXIT</button>
         </div>
@@ -332,22 +345,22 @@ let currentSFXIndex = 0;
 let SFX = SFX_SETS[0];
 
 const SONGS = [
-    { id: 0, title: "01.泥土裡的壞脾氣", color: "#66ff66", cover: "https://i.meee.com.tw/YCIig0r.jpg", src: "https://files.catbox.moe/n0otl1.mp3", preview: 10.4 },
-    { id: 1, title: "02.無頭騎士序曲", color: "#ff4500", cover: "https://meee.com.tw/VJB7LBg.jpg", src: "https://files.catbox.moe/9aqtcj.mp3", preview: 14.4 },
-    { id: 2, title: "03.鏽蝕的脈搏", color: "#8b4513", cover: "https://files.catbox.moe/xivzat.jpg", src: "https://files.catbox.moe/rqwk8s.mp3", preview: 10 },
-    { id: 3, title: "04.霧都點名簿", color: "#232896", cover: "https://files.catbox.moe/axic1b.jpg", src: "https://files.catbox.moe/9mz87d.mp3", preview: 10 },
-    { id: 4, title: "05.星盤下的謊言", color: "#ff0000", cover: "https://files.catbox.moe/4pis1o.jpg", src: "https://files.catbox.moe/tkok9u.mp3", preview: 10 },
-    { id: 5, title: "06.泛黃的處方籤", color: "#eee8aa", cover: "https://files.catbox.moe/5wamgm.jpg", src: "https://files.catbox.moe/fyxcfi.mp3", preview: 10 },
-    { id: 6, title: "07.這麻煩有點大", color: "#9394E6", cover: "https://files.catbox.moe/oi2lh5.jpg", src: "https://files.catbox.moe/g8dbzw.mp3", preview: 10 },
-    { id: 7, title: "08.絕對無菌的處刑曲", color: "#85846A", cover: "https://files.catbox.moe/ishaxg.jpg", src: "https://files.catbox.moe/ffb3gz.mp3", preview: 10 },
-    { id: 8, title: "09.真理跪拜於我", color: "#00008b", cover: "https://files.catbox.moe/q06wsw.jpg", src: "https://files.catbox.moe/8mo7mf.mp3", preview: 10 },
-    { id: 9, title: "10.玻璃的恩典", color: "#87ceeb", cover: "https://files.catbox.moe/unqwk1.jpg", src: "https://files.catbox.moe/9lxu2s.mp3", preview: 10 },
-    { id: 10, title: "11.易碎的明天", color: "#ffd700", cover: "https://files.catbox.moe/5mfu5q.jpg", src: "https://files.catbox.moe/4j2pty.mp3", preview: 10 },
-    { id: 11, title: "12.越界的代價", color: "#4C3E80", cover: "https://files.catbox.moe/zmpmwk.jpg", src: "https://files.catbox.moe/kg60ar.mp3", preview: 10 },
-    { id: 12, title: "13.融入的藝術", color: "#ff69b4", cover: "https://files.catbox.moe/usm7nv.jpg", src: "https://files.catbox.moe/v2dt14.mp3", preview: 10 },
-    { id: 13, title: "14.名為永恆的毒蘋果", color: "#800080", cover: "https://files.catbox.moe/2xbvom.jpg", src: "https://files.catbox.moe/5wtu1z.mp3", preview: 10 },
-    { id: 14, title: "15.零層會議", color: "#333333", cover: "https://files.catbox.moe/bgpkld.jpg", src: "https://files.catbox.moe/mklbah.mp3", preview: 10 },
-    { id: 15, title: "16.最初的清晨", color: "#F5CC5B", cover: "https://files.catbox.moe/y6efl4.jpg", src: "https://files.catbox.moe/xcbk67.mp3", preview: 10 }
+    { id: 0, title: "泥土裡的壞脾氣", color: "#66ff66", cover: "https://i.meee.com.tw/YCIig0r.jpg", src: "https://files.catbox.moe/n0otl1.mp3", preview: 10.4 },
+    { id: 1, title: "無頭騎士序曲", color: "#ff4500", cover: "https://meee.com.tw/VJB7LBg.jpg", src: "https://files.catbox.moe/9aqtcj.mp3", preview: 14.4 },
+    { id: 2, title: "鏽蝕的脈搏", color: "#8b4513", cover: "https://files.catbox.moe/xivzat.jpg", src: "https://files.catbox.moe/rqwk8s.mp3", preview: 10 },
+    { id: 3, title: "霧都點名簿", color: "#232896", cover: "https://files.catbox.moe/axic1b.jpg", src: "https://files.catbox.moe/9mz87d.mp3", preview: 10 },
+    { id: 4, title: "星盤下的謊言", color: "#ff0000", cover: "https://files.catbox.moe/4pis1o.jpg", src: "https://files.catbox.moe/tkok9u.mp3", preview: 10 },
+    { id: 5, title: "泛黃的處方籤", color: "#eee8aa", cover: "https://files.catbox.moe/5wamgm.jpg", src: "https://files.catbox.moe/fyxcfi.mp3", preview: 10 },
+    { id: 6, title: "這麻煩有點大", color: "#9394E6", cover: "https://files.catbox.moe/oi2lh5.jpg", src: "https://files.catbox.moe/g8dbzw.mp3", preview: 10 },
+    { id: 7, title: "絕對無菌的處刑曲", color: "#85846A", cover: "https://files.catbox.moe/ishaxg.jpg", src: "https://files.catbox.moe/ffb3gz.mp3", preview: 10 },
+    { id: 8, title: "真理跪拜於我", color: "#00008b", cover: "https://files.catbox.moe/q06wsw.jpg", src: "https://files.catbox.moe/8mo7mf.mp3", preview: 10 },
+    { id: 9, title: "玻璃的恩典", color: "#87ceeb", cover: "https://files.catbox.moe/unqwk1.jpg", src: "https://files.catbox.moe/9lxu2s.mp3", preview: 10 },
+    { id: 10, title: "易碎的明天", color: "#ffd700", cover: "https://files.catbox.moe/5mfu5q.jpg", src: "https://files.catbox.moe/4j2pty.mp3", preview: 10 },
+    { id: 11, title: "越界的代價", color: "#4C3E80", cover: "https://files.catbox.moe/zmpmwk.jpg", src: "https://files.catbox.moe/kg60ar.mp3", preview: 10 },
+    { id: 12, title: "融入的藝術", color: "#ff69b4", cover: "https://files.catbox.moe/usm7nv.jpg", src: "https://files.catbox.moe/v2dt14.mp3", preview: 10 },
+    { id: 13, title: "名為永恆的毒蘋果", color: "#800080", cover: "https://files.catbox.moe/2xbvom.jpg", src: "https://files.catbox.moe/5wtu1z.mp3", preview: 10 },
+    { id: 14, title: "零層會議", color: "#333333", cover: "https://files.catbox.moe/bgpkld.jpg", src: "https://files.catbox.moe/mklbah.mp3", preview: 10 },
+    { id: 15, title: "最初的清晨", color: "#F5CC5B", cover: "https://files.catbox.moe/y6efl4.jpg", src: "https://files.catbox.moe/xcbk67.mp3", preview: 10 }
 ,{ id: 16, title: "Coming soon", color: "#ffffff", cover: "https://files.catbox.moe/ypzq8c.jpg", src: "", preview: 10 }
 ];
 const JSON_DB = {
@@ -119524,6 +119537,7 @@ const JSON_DB = {
   ]
 }  // 16.最初的清晨
 };
+
 const STORAGE_KEY = 'nocturne_save_v6'; 
 let userOffset = parseInt(localStorage.getItem('nocturne_offset') || 0);
 let userSpeed = parseFloat(localStorage.getItem('nocturne_speed') || 1.0);
@@ -119553,7 +119567,7 @@ function adjustSpeed(delta) {
         else if (currentDiff === 'NORMAL') base = 2.0;
         else if (currentDiff === 'HARD') base = 1.6;
         else if (currentDiff === 'MASTER') base = 1.3;
-        currentFallTime = base / userSpeed;
+        currentFallTime = (base / userSpeed) * (userJudgeLinePct / 0.65);
     }
 }
 
@@ -119742,9 +119756,9 @@ function generateChart(jsonData, diff) {
 const PERSPECTIVE_TOP_SCALE = 0.5; // Top is 50% of bottom width
 
 let currentFallTime = 2.0; 
-const JUDGE_LINE_PCT = 0.65; 
+let userJudgeLinePct = parseFloat(localStorage.getItem('nocturne_judgeLine') || 0.65);
 let userJudgeX = parseFloat(localStorage.getItem('nocturne_judgeX') || 0.25);
-let userJudgeY = parseFloat(localStorage.getItem('nocturne_judgeY') || 0.15);
+let userJudgeY = parseFloat(localStorage.getItem('nocturne_judgeY') || 0.3);
 const AUDIO_DELAY = 3.0; 
 const P_WIN = 0.08; const GR_WIN = 0.15; const GD_WIN = 0.25; 
 
@@ -119783,7 +119797,7 @@ window.onload = () => {
     document.getElementById('speed-display').innerText = userSpeed.toFixed(1);
     document.getElementById('vol-music').value = musicVol;
     document.getElementById('vol-sfx').value = sfxVol;
-    updateJudgeRangeUI();
+    updateSettingsUI();
     loop();
     const bind = (evt) => inputZone.addEventListener(evt, handleInput, {passive:false});
     bind('mousedown'); bind('touchstart'); bind('touchmove'); bind('touchend'); bind('mouseup');
@@ -119802,7 +119816,7 @@ function adjustJudgeRangeX(delta) {
     if(userJudgeX > 0.5) userJudgeX = 0.5;
     userJudgeX = Math.round(userJudgeX*100)/100;
     localStorage.setItem('nocturne_judgeX', userJudgeX);
-    updateJudgeRangeUI();
+    updateSettingsUI();
 }
 
 function adjustJudgeRangeY(delta) {
@@ -119811,14 +119825,26 @@ function adjustJudgeRangeY(delta) {
     if(userJudgeY > 0.5) userJudgeY = 0.5;
     userJudgeY = Math.round(userJudgeY*100)/100;
     localStorage.setItem('nocturne_judgeY', userJudgeY);
-    updateJudgeRangeUI();
+    updateSettingsUI();
 }
 
-function updateJudgeRangeUI() {
+function adjustJudgeLineHeight(delta) {
+    userJudgeLinePct += delta;
+    if(userJudgeLinePct < 0.4) userJudgeLinePct = 0.4;
+    if(userJudgeLinePct > 0.9) userJudgeLinePct = 0.9;
+    userJudgeLinePct = Math.round(userJudgeLinePct*100)/100;
+    localStorage.setItem('nocturne_judgeLine', userJudgeLinePct);
+    updateSettingsUI();
+    if (gameState === 'PAUSE') adjustSpeed(0); // Recalculate fall time
+}
+
+function updateSettingsUI() {
     const dx = document.getElementById('judge-x-display');
     if(dx) dx.innerText = Math.round(userJudgeX*100) + "%";
     const dy = document.getElementById('judge-y-display');
     if(dy) dy.innerText = Math.round(userJudgeY*100) + "%";
+    const dl = document.getElementById('judge-line-display');
+    if(dl) dl.innerText = Math.round(userJudgeLinePct*100) + "%";
 }
 
 async function loadSFX(url, key) {
@@ -119936,7 +119962,7 @@ function startGame(diff) {
     else if (diff === 'NORMAL') currentFallTime = 2.0;
     else if (diff === 'HARD') currentFallTime = 1.6; 
     else if (diff === 'MASTER') currentFallTime = 1.3; 
-    currentFallTime /= userSpeed;
+    currentFallTime = (currentFallTime / userSpeed) * (userJudgeLinePct / 0.65);
 
     const song = SONGS[currentSongIdx];
     const notes = generateChart(JSON_DB[song.id], diff);
@@ -120004,7 +120030,7 @@ function loop() {
         } else { touchFeedback.splice(i,1); }
     });
 
-    const JUDGE_Y = height * JUDGE_LINE_PCT;
+    const JUDGE_Y = height * userJudgeLinePct;
     const songColor = SONGS[currentSongIdx].color;
 
     const topWidth = width * PERSPECTIVE_TOP_SCALE;
@@ -120316,8 +120342,9 @@ function handleInput(e) {
     const time = rawTime - (userOffset / 1000); 
     
     const rect = inputZone.getBoundingClientRect();
+    const JUDGE_Y = height * userJudgeLinePct;
     const NORMAL_X_WIN = width * userJudgeX; 
-    const NORMAL_Y_WIN = width * userJudgeY; 
+    const NORMAL_Y_WIN = height * userJudgeY; 
     const SLIDE_X_WIN = width * 0.05; 
 
     touches.forEach(t => {
@@ -120345,6 +120372,8 @@ function handleInput(e) {
             touchStartPos.delete(id);
         }
 
+        const isVerticallyValid = Math.abs(ty - JUDGE_Y) <= NORMAL_Y_WIN;
+
         for (let i = 0; i < activeNotes.length; i++) {
             let n = activeNotes[i];
             if(n.hit || n.missed) continue; 
@@ -120361,6 +120390,8 @@ function handleInput(e) {
             // HOLD
             if (n.type === 2 || n.type === 6) {
                 if (type === 'touchstart' || type === 'mousedown' || (n.type===6 && type==='touchmove')) {
+                    if ((type === 'touchstart' || type === 'mousedown') && !isVerticallyValid) continue;
+
                     if (n.holding && n.holdingTouchId !== null && n.holdingTouchId !== id) continue; 
                     
                     let isStartHit = (type === 'touchstart' || type === 'mousedown') && dt <= GD_WIN && Math.abs(tx - targetX) < NORMAL_X_WIN;
@@ -120374,7 +120405,7 @@ function handleInput(e) {
 
                     if(isStartHit && !n.holding) {
                         playSFX('HOLD'); n.holding = true;
-                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
+                        hitEffects.push({x: targetX, y: ty, life: 1, color: n.songColor});
                         n.holdingTouchId = id;
                         break; 
                     }
@@ -120384,18 +120415,18 @@ function handleInput(e) {
 
             // SLIDE
             if (n.type === 3) {
-                if (Math.abs(tx - targetX) < SLIDE_X_WIN && dt <= GD_WIN) {
+                if (Math.abs(tx - targetX) < SLIDE_X_WIN && dt <= GD_WIN && isVerticallyValid) {
                     if (type === 'touchstart' || type === 'mousedown' || type === 'touchmove') {
                         playSFX('SLIDE'); n.hit=true; 
                         addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)");
-                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
-                        combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 8); updateHUD();
+                        hitEffects.push({x: targetX, y: ty, life: 1, color: n.songColor});
+                        combo++; spawnParticles(targetX, height*userJudgeLinePct, n.songColor, 8); updateHUD();
                     }
                 }
             } 
             // FLICK
             else if (n.type >= 4 && n.type <= 8) {
-                 if (Math.abs(tx - targetX) < NORMAL_X_WIN && dt <= GD_WIN) {
+                 if (Math.abs(tx - targetX) < NORMAL_X_WIN && dt <= GD_WIN && isVerticallyValid) {
                      let triggered = false;
                      const flickThresh = width * 0.02;
                      if (type === 'touchmove' || type === 'touchend' || type === 'mouseup') {
@@ -120408,22 +120439,22 @@ function handleInput(e) {
                      if (triggered) {
                         playSFX('FLICK'); n.hit=true; 
                         addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)");
-                        hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
-                        combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 20); updateHUD();
+                        hitEffects.push({x: targetX, y: ty, life: 1, color: n.songColor});
+                        combo++; spawnParticles(targetX, height*userJudgeLinePct, n.songColor, 20); updateHUD();
                         break; 
                      }
                  }
             }
             // TAP
             else {
-                if (Math.abs(tx - targetX) < NORMAL_X_WIN && dt <= GD_WIN) {
+                if (Math.abs(tx - targetX) < NORMAL_X_WIN && dt <= GD_WIN && isVerticallyValid) {
                     if (type === 'touchstart' || type === 'mousedown') {
                          playSFX('TAP'); n.hit=true; 
                          if (dt < P_WIN) { addScore(1.0); stats.p++; triggerJudge("PERFECT", "var(--c-perfect)"); }
                          else if (dt < GR_WIN) { addScore(0.8); stats.gr++; triggerJudge("GREAT", "var(--c-great)"); }
                          else { addScore(0.5); stats.gd++; triggerJudge("GOOD", "var(--c-good)"); }
-                         hitEffects.push({x: targetX, y: height*JUDGE_LINE_PCT, life: 1, color: n.songColor});
-                         combo++; spawnParticles(targetX, height*JUDGE_LINE_PCT, n.songColor, 15); updateHUD();
+                         hitEffects.push({x: targetX, y: ty, life: 1, color: n.songColor});
+                         combo++; spawnParticles(targetX, height*userJudgeLinePct, n.songColor, 15); updateHUD();
                          break;
                     }
                 }
@@ -120532,6 +120563,58 @@ function showResult() {
     if(r === "SS") rankEl.classList.add("rank-SS");
     
     saveHighScore(SONGS[currentSongIdx].id, currentDiff, score, r);
+}
+
+function triggerJudge(txt, colorVar) {
+    const el = document.getElementById('judge'); el.innerText=txt; el.style.color = colorVar;
+    el.classList.remove('anim-judge'); void el.offsetWidth; el.classList.add('anim-judge');
+}
+function updateHUD() { 
+    document.getElementById('score').innerText=score.toString().padStart(6,'0'); 
+    const cEl = document.getElementById('combo');
+    if(combo > 1) { cEl.innerText = combo; cEl.classList.remove('bump'); void cEl.offsetWidth; cEl.classList.add('bump'); } else { cEl.innerText = ""; }
+    if(combo > maxCombo) maxCombo = combo;
+}
+function pauseGame() { 
+    if(gameState==="PLAY" || gameState==="COUNTDOWN" || gameState==="HOME"){
+        pausedFrom = gameState;
+        if(gameState === "COUNTDOWN") {
+            clearInterval(countdownTimer);
+            pausedFrom = "PLAY";
+        }
+        pausedTime = document.getElementById('bgm').currentTime;
+        gameState="PAUSE"; 
+        document.getElementById('bgm').pause(); 
+        document.getElementById('screen-pause').classList.remove('hidden');
+    }
+}
+function resumeGame() { 
+    document.getElementById('screen-pause').classList.add('hidden');
+    if (pausedFrom === "HOME") {
+        gameState = "HOME";
+        startPreview();
+        return;
+    }
+    
+    // 1 second wait on current frame
+    gameState = "RESUME_WAIT";
+    
+    setTimeout(() => {
+        gameState = "PLAY";
+        const bgm = document.getElementById('bgm');
+        // Recalculate start time based on current audio time to ensure sync
+        gameStartTime = performance.now() - (bgm.currentTime + AUDIO_DELAY) * 1000;
+        bgm.play().catch(()=>{});
+    }, 1000);
+}
+function quitGame() {
+    gameState="HOME"; stopPreview(); document.getElementById('bgm').pause(); isAudioPlaying = false;
+    document.getElementById('screen-hud').classList.add('hidden');
+    document.getElementById('screen-pause').classList.add('hidden');
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-home').classList.remove('hidden'); document.getElementById('screen-home').classList.add('active-ui');
+    document.getElementById('master-layer').style.opacity = 0;
+    initCarousel(); updateHomeUI();
 }
 </script>
 </body>
