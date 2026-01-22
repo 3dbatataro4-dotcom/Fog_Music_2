@@ -280,7 +280,7 @@
                     <div class="setting-label">JUDGE Y</div>
                     <div class="setting-control">
                         <button class="btn-offset" onclick="adjustJudgeRangeY(-0.01)">-</button>
-                        <span id="judge-y-display" style="min-width: 6vh; text-align: center;">15%</span>
+                        <span id="judge-y-display" style="min-width: 6vh; text-align: center;">0%</span>
                         <button class="btn-offset" onclick="adjustJudgeRangeY(0.01)">+</button>
                     </div>
                 </div>
@@ -122185,8 +122185,8 @@ function handleResize() {
 
 function adjustJudgeRangeX(delta) {
     userJudgeX += delta;
-    if(userJudgeX < 0.05) userJudgeX = 0.05;
-    if(userJudgeX > 0.5) userJudgeX = 0.5;
+    if(userJudgeX < 0.02) userJudgeX = 0.02;
+    if(userJudgeX > 0.2) userJudgeX = 0.2;
     userJudgeX = Math.round(userJudgeX*100)/100;
     localStorage.setItem('nocturne_judgeX', userJudgeX);
     updateJudgeRangeUI();
@@ -122194,8 +122194,8 @@ function adjustJudgeRangeX(delta) {
 
 function adjustJudgeRangeY(delta) {
     userJudgeY += delta;
-    if(userJudgeY < 0.05) userJudgeY = 0.05;
-    if(userJudgeY > 0.5) userJudgeY = 0.5;
+    if(userJudgeY < 0.01) userJudgeY = 0.01;
+    if(userJudgeY > 0.1) userJudgeY = 0.1;
     userJudgeY = Math.round(userJudgeY*100)/100;
     localStorage.setItem('nocturne_judgeY', userJudgeY);
     updateJudgeRangeUI();
